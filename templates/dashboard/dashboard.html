@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.11.5/css/jquery.dataTables.min.css">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+</head>
+<body>
+    <body class="bg-light">
+        <div class="container text-center mt-5">
+            <h2 class="mb-4">Dashboard</h2>
+    
+            <div class="d-flex justify-content-center gap-3">
+                <a href = "/logout/" class = 'btn btn-danger btn-sm'>Logout</a>
+                
+                <!-- Clients Button -->
+                <a href="{% url 'client_list' %}" class="btn btn-primary btn-lg">
+                    <i class="fas fa-users"></i> View Clients
+                </a>
+                
+                <!-- Customers Button -->
+                <a href="{% url 'customer_list' %}" class="btn btn-primary btn-lg">
+                    <i class="fas fa-user"></i> View Customers
+                </a>
+
+                <!-- sitee Button -->
+                <a href="{% url 'sitee_list' %}" class="btn btn-primary btn-lg">
+                    <i class="fas fa-users"></i> View Sitees
+                </a>
+
+                <!-- Asset Button -->
+                <a href="{% url 'asset_list' %}" class="btn btn-primary btn-lg">
+                    <i class="fas fa-users"></i> View Assets
+                </a>
+            </div>
+        </div>
+    
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

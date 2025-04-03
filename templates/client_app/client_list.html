@@ -1,0 +1,422 @@
+<!DOCTYPE html>
+<html lang="en">
+    
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Client List</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.11.5/css/jquery.dataTables.min.css">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+</head>
+
+<body>
+    <div class="container mt-5">
+        <h2>Client List</h2>
+
+        <button  class="btn btn-success btn-sm delete-btn" 
+        data-bs-toggle="modal"
+        data-bs-target="#createClientModal">
+        Add Client
+        </button>
+        
+        <div class="d-flex justify-content-end mb-3">
+            <a href="{% url 'home' %}" class="btn btn-primary btn-sm">Dashboard</a>
+        </div>
+    </div>
+
+    <!--Pagination-->
+    <div class="d-flex justify-content-between mt-3">
+        <button id="prevPage" class="btn btn-sm btn-secondary" disabled>Previous</button>
+        <span id="paginationText">Page 1 of X</span>
+        <button id="nextPage" class="btn btn-sm btn-secondary" disabled>Next</button>
+    </div>
+
+    <!-- Edit Modal -->
+    <div class="modal fade" id="editClientModal" tabindex="-1" aria-labelledby="editClientModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="editClientModalLabel">Edit Client</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="editClientForm" method="POST">
+                        {% csrf_token %}
+                        <input type="hidden" id="client_id" name="client_id">
+                        <div class="mb-3">
+                            <label for="client_name" class="form-label">Name</label>
+                            <input type="text" class="form-control" id="client_name" name="name">
+                        </div>
+                        <div class="mb-3">
+                            <label for="client_phone" class="form-label">Phone Number</label>
+                            <input type="text" class="form-control" id="client_phone" name="phone_num">
+                        </div>
+                        <div class="mb-3">
+                            <label for="client_address" class="form-label">Address</label>
+                            <input type="text" class="form-control" id="client_address" name="address">
+                        </div>
+                        <button type="submit" class="btn btn-primary">Save Changes</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Create Modal -->
+    <div class="modal fade" id="createClientModal" tabindex="-1" aria-labelledby="createClientModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="createClientModalLabel">Create Client</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="createClientForm" method="POST">
+                        {% csrf_token %}
+                        <input type="hidden" id="client_id" name="client_id">
+                        <div class="mb-3">
+                            <label for="client_name" class="form-label">Name</label>
+                            <input type="text" class="form-control" id="client_name" name="name">
+                        </div>
+                        <div class="mb-3">
+                            <label for="client_phone" class="form-label">Phone Number</label>
+                            <input type="text" class="form-control" id="client_phone" name="phone_num">
+                        </div>
+                        <div class="mb-3">
+                            <label for="client_address" class="form-label">Address</label>
+                            <input type="text" class="form-control" id="client_address" name="address">
+                        </div>
+                        <button type="submit" class="btn btn-primary">Create</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- copy Modal -->
+    <div class="modal fade" id="copyClientModal" tabindex="-1" aria-labelledby="copyClientModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="copyClientModalLabel">Copy Client</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="copyClientForm" method="POST">
+                        {% csrf_token %}
+                        <input type="hidden" id="client_id" name="client_id">
+                        <div class="mb-3">
+                            <label for="client_name" class="form-label">Name</label>
+                            <input type="text" class="form-control" id="client_name" name="name">
+                        </div>
+                        <div class="mb-3">
+                            <label for="client_phone" class="form-label">Phone Number</label>
+                            <input type="text" class="form-control" id="client_phone" name="phone_num">
+                        </div>
+                        <div class="mb-3">
+                            <label for="client_address" class="form-label">Address</label>
+                            <input type="text" class="form-control" id="client_address" name="address">
+                        </div>
+                        <button type="submit" class="btn btn-primary">Copy Client</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    {% comment %} Delete_modal {% endcomment %}
+    <div class="modal fade" id="deleteClientModal" tabindex="-1" aria-labelledby="deleteClientModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="deleteClientModalLabel">Delete Client</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="deleteClientForm" method="POST">
+                        {% csrf_token %}
+                        <input type="hidden" id="client_id" name="client_id">
+                        <button type="submit" class="btn btn-primary">Yes Delete</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+{% comment %} Main page body {% endcomment %}
+    <div class="container mt-4">
+        <table id="clientTable" class="display table table-bordered table-striped">
+            <thead>
+                <tr>
+                    <th>ID#</th>
+                    <th>Name</th>
+                    <th>Phone</th>
+                    <th>Address</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for client in clients %}
+                <tr>
+                    <td>{{ client.id }}</td>
+                    <td>{{ client.name }}</td>
+                    <td>{{ client.phone_num }}</td>
+                    <td>{{ client.address }}</td>
+                    <td>
+                        <button onclick="getClientDetails({{client.id}})" class="btn btn-warning btn-sm edit-btn" 
+                            data-bs-toggle="modal"
+                            data-bs-target="#editClientModal">
+                            Edit
+                        </button>
+                        <button onclick="deleteClientDetails({{client.id}})" class="btn btn-danger btn-sm delete-btn" 
+                            data-bs-toggle="modal"
+                            data-bs-target="#deleteClientModal">
+                            Delete
+                        </button>
+                        <button onclick="copyClientDetails({{client.id}})" class="btn btn-primary btn-sm delete-btn" 
+                            data-bs-toggle="modal"
+                            data-bs-target="#copyClientModal">
+                            Copy
+                        </button>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    <script>
+        
+        function getClientDetails(clientId) {
+            if (clientsData[clientId]) {
+                console.log("Client Name:", clientsData[clientId].name);
+                console.log("Phone Number:", clientsData[clientId].phone_num);
+                console.log("Address:", clientsData[clientId].address);
+                $("#client_id").val(clientsData[clientId].id)
+                $("#client_name").val(clientsData[clientId].name);
+                $("#client_phone").val( clientsData[clientId].phone_num);
+                $("#client_address").val(clientsData[clientId].address);
+            } else {
+                console.log("Client not found.");
+            }
+        }
+        $(document).ready(function() {
+            loadePage(1); // Fetch first page when the page loads
+        });
+        
+        //Page ajax
+        let current_page = 1
+        function loadePage(page){
+            $.ajax({
+                url :"/clients/?page=" + page,
+                type: "GET",
+                headers:{"X-Requested-With" : "XMLHttpRequest"},
+                success:function(response){
+                    updateTable(response.clients);
+                    updatePagination(response.current_page, response.total_pages);
+                },
+                error : function(xhr){
+                    alert("Pagination is not working");
+                }
+            });
+        }
+
+        let clientsData = {};
+        //updateTable
+        function updateTable(clients){  
+            clients.forEach(client =>{
+                clientsData[client.id] = {
+                    id: client.id,
+                    name: client.name,
+                    phone_num: client.phone_num,
+                    address: client.address
+                };
+            });
+            console.log(clientsData)
+
+            let tablebody = $('#clientTable tbody');
+            tablebody.empty();
+            clients.forEach(client =>{
+
+                let row = `<tr>
+                    <td>${client.id}</td>
+                    <td>${client.name}</td>
+                    <td>${client.phone_num}</td>
+                    <td>${client.address}</td>
+                    <td>
+                        <button onclick="getClientDetails(${client.id})" class="btn btn-warning btn-sm edit-btn" 
+                            data-bs-toggle="modal"
+                            data-bs-target="#editClientModal">
+                            Edit
+                        </button>
+                        <button onclick="deleteClientDetails(${client.id})" class="btn btn-danger btn-sm delete-btn" 
+                            data-bs-toggle="modal"
+                            data-bs-target="#deleteClientModal">
+                            Delete
+                        </button>
+                        <button onclick="copyClientDetails(${client.id})" class="btn btn-primary btn-sm copy-btn" 
+                            data-bs-toggle="modal"
+                            data-bs-target="#copyClientModal">
+                            Copy
+                        </button>
+                    </td>
+                </tr>`;
+                    tablebody.append(row);
+            });
+        }
+
+        //updatePagination
+        function updatePagination(current, total){
+            $("#paginationText").text(`Page ${current} of ${total}`);
+
+            $("#prevPage").prop("disabled", current == 1);
+            $("#nextPage").prop("disabled", current >= total);
+        }
+
+        $("#prevPage").click(function(){
+            if(current_page > 1){
+                current_page --;
+                loadePage(current_page);
+            }
+        });
+
+        $("#nextPage").click(function(){
+            current_page++;
+            loadePage(current_page);
+        });
+        //Delete Client
+        function deleteClientDetails(clientId){
+            console.log(clientId)
+            if (clientsData[clientId]) {
+                console.log("Client Name:", clientsData[clientId].name);
+                console.log("Phone Number:", clientsData[clientId].phone_num);
+                console.log("Address:", clientsData[clientId].address);
+                $("#deleteClientModal h3").text(`Are you sure you want to delete ${clientsData[clientId].name}?`);
+                $("#deleteClientModal #client_id").val(clientsData[clientId].id);
+            } else {
+                console.log("Client not found.");
+            }
+        }
+        //Copy Client 
+        function copyClientDetails(clientId){
+            if (clientsData[clientId]){
+                console.log("filling copy modal with client id:", clientId);
+
+                $("#copyClientModal #client_id").val(clientsData[clientId].id).prop("readonly", true);
+                $("#copyClientModal #client_name").val(clientsData[clientId].name + ' - copy').prop("readonly", true);
+                $("#copyClientModal #client_phone").val(clientsData[clientId].phone_num).prop("readonly", true);
+                $("#copyClientModal #client_address").val(clientsData[clientId].address  + ' - copy').prop("readonly", true);
+            }
+        }
+            
+        function client_update(clientId){
+            $.ajax({
+                url: `/client_update/${clientId}`,
+                type: "GET",
+                success: function(response){
+                    console.log("Client update function triggered.");
+                }
+            });
+        }
+
+        // Edit ajax
+        $(document).ready(function() {
+            $("#editClientForm").submit(function(e) {
+                e.preventDefault();
+                let formData = $(this).serialize();
+                console.log(formData)
+                console.log("Client ID:", $("#client_id").val());
+                $.ajax({
+                    type: "POST",
+                    url: "{% url 'client_update' %}",
+                    data: formData,
+                    success: function(response) {
+                        alert("Client updated successfully!");
+                        location.reload();
+                    },
+                    error: function(xhr) {
+                        alert("Error updating client.");
+                    }
+                });
+            });
+        });
+        // Copy ajax
+        $(document).ready(function() {
+            $("#copyClientForm").submit(function(e) {
+                e.preventDefault();
+                let formData = $(this).serialize();
+                console.log(formData)
+                console.log("Client ID:", $("#client_id").val());
+                $.ajax({
+                    type: "POST",
+                    url: "{% url 'client_copy' %}",
+                    data: formData,
+                    success: function(response) {
+                        alert("Client Copied successfully!");
+                        location.reload();
+                    },
+                    error: function(xhr) {
+                        alert("Error Coping client.");
+                    }
+                });
+            });
+        });
+        
+        //Delete ajax
+        $(document).ready(function() {
+            $("#deleteClientForm").submit(function(e){
+                e.preventDefault();
+                let formData = $(this).serialize();
+                console.log("Client ID:", $("#client_id").val());
+                $.ajax({
+                    type: "POST",
+                    url: "{% url 'client_delete' %}",
+                    data: formData,
+                    success: function(response) {
+                        location.reload();
+                    },
+                    error: function(xhr) {
+                        alert("Error Deleting client.");
+                    }
+                });
+            });
+        });
+        // create ajax
+        $(document).ready(function(){
+            $("#createClientForm").submit(function(e){
+                e.preventDefault();
+                let formData = $(this).serialize();
+                console.log(formData)
+                $.ajax({
+                    url: "{% url 'client_create' %}",
+                    type: 'POST',
+                    data : formData,
+                    success: function(response){
+                        alert("Client created successfully")
+                        location.reload();
+                    },
+                    error: function(xhr){
+                        alert("Error creating client.");
+                    }
+                });
+            });
+        });
+        
+        function send_ajax(){
+            $.ajax({
+                url: "{% url 'client_list_in_json' %}",
+                type: "GET",
+                success: function(response) {
+                    console.log(response);
+                    response.clients.forEach(client => console.log(client.name));
+                },
+                error: function(xhr) {
+                    alert("Error: " + xhr.responseText);
+                }
+            });
+        }
+    </script>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.min.js"></script>
+</body>
+</html>

@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Assets</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.11.5/css/jquery.dataTables.min.css">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+</head>
+<body>
+    <div class="container mt-5">
+        <h4 class="mb-0">Asset List</h4>
+    
+        <div class="d-flex justify-content-end mb-3">
+            <a href="{% url 'home' %}" class='btn btn-primary btn-lg'>
+                <i class='fas fa-users'></i> Dashboard
+            </a>
+        </div>
+
+        <button class='btn btn-success btn-sm' data-bs-toggle='modal' data-bs-target='#createAssetModal'>
+            Add Asset
+        </button>
+    </div>
+    <div class = 'container my-3'>
+        <form method = 'GET' id='filterForm' class="row g-2">
+            <div class = "col-md-3">
+                <label for='search' class= "form-label">Search</label>
+                <input type = 'text' name = 'search' id = 'search'class = 'form-control' placehoder="Search....">
+            </div>
+            <!--client-->
+            <div class='col-md-3'>
+                <label for='client' class= 'form-label'>Client</label>
+                <select name = 'client' id='client' class='form-control'>
+                    <option value=''>All Clients</option>
+                    {% for client in clients %}
+                        <option value= '{{ client.id }}' {% if request.GET.client|default_if_none:"" == client.id|slugify %}selected{% endif %}>{{ client.name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <!--customer-->
+            <div class='col-md-3'>
+                <label for='customer' class= 'form-label'>Customer</label>
+                <select name = 'customer' id='customer' class='form-control'>
+                    <option value=''>All Customers</option>
+                    {% for customer in customers %}
+                        <option value= '{{ customer.id }}' {% if request.GET.customer|default_if_none:"" == customer.id|slugify %}selected{% endif %}>{{ customer.name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <!--sitee-->
+            <div class='col-md-3'>
+                <label for='sitee' class= 'form-label'>Sitee</label>
+                <select name = 'sitee' id='sitee' class='form-control'>
+                    <option value=''>All Sitee</option>
+                    {% for sitee in sitees %}
+                        <option value= '{{ sitee.id }}' {% if request.GET.sitee|default_if_none:"" == sitee.id|slugify %}selected{% endif %}>{{ sitee.name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div class="col-md-3 d-flex align-items-end">
+                <button type="submit" class="btn btn-primary">Filter</button>
+                <a href="{% url 'asset_list' %}" class="btn btn-secondary ms-2">Reset</a>
+            </div>
+        </form>
+    </div>
+
+    <!--Pagination-->
+    <div class= 'pagination mt-3'>
+        <button id ="prevPage" class ='btn btn-outline-primary btn-xs' {% if current_page == 1 %} disabled {% endif %}>Previouse</button>
+        
+        <span id = 'paginationText'> Page {{current_page}} of {{total_pages}} </span>
+
+        <button id ="nextPage" class ='btn btn-outline-primary btn-xs' {% if current_page == total_pages %} disabled {% endif %}>Next</button>
+    </div>
+
+    <div class="modal fade" id="createAssetModal" tabindex="-1" aria-labelledby="createAssetModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+      
+            <!-- Modal Header -->
+            <div class="modal-header">
+              <h5 class="modal-title" id="modalLabel">Add Asset</h5>
+              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+      
+            <!-- Modal Body -->
+            <div class="modal-body">
+                <form id = 'createAssetForm' method ="POST">
+                {% csrf_token %}
+                    <div class = 'mb-3'>
+                        <label for = "asset_name" class= "asset_name"> Name </label>
+                        <input type = 'text' class= 'form-control' id ='asset_name' name= 'name'>
+                    </div>
+
+                    <div class = 'mb-3'>
+                        <label for = "asset_phone" class= "asset_phone"> Phone # </label>
+                        <input type = 'text' class= 'form-control' id ='asset_phone' name= 'phone_num'>
+                    </div>
+
+                    <div class = 'mb-3'>
+                        <label for = "asset_address" class= "asset_address"> Address </label>
+                        <input type = 'text' class= 'form-control' id ='asset_address' name= 'address'>
+                    </div>
+
+                    <select class = 'form-control' name = 'sitee'>
+                        {% for sitee in sitees%}
+                            <option value='{{ sitee.id }}'>{{sitee.name}}</option>
+                        {% endfor %}
+                    </select>
+                
+            </div>
+      
+            <!-- 🔹 Modal Footer -->
+            <div class="modal-footer">
+              <button type="submit" class="btn btn-primary">Save</button>
+            </div>
+      
+          </div>
+        </div>
+    </div>
+
+    <div class = 'container mt-4'>
+        <table id = 'assetTable' class="display table table-bordered table-striped">
+            <thead>
+                <tr>
+                    <th>Id#</th>
+                    <th>Name</th>
+                    <th>Phone #</th>
+                    <th>Address</th>
+                    <th>Sitee</th>
+                    <th>Customer</th>
+                    <th>Client</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for asset in assets%}
+                    <tr>
+                        <td>{{asset.id}}</td>
+                        <td>{{asset.name}}</td>
+                        <td>{{asset.phone_num}}</td>
+                        <td>{{asset.address}}</td>
+                        <td>{{asset.sitee}}</td>
+                        <td>{{asset.sitee.customer}}</td>
+                        <td>{{asset.sitee.customer.client}}</td>
+                    </tr>
+                {% endfor%}
+            </tbody>
+        </table>
+    </div>
+    <script>
+
+        var assetsData={}
+        
+        {% for asset in assets %}
+        assetsData['{{asset.id}}']={
+            id: '{{asset.id}}',
+                name: '{{asset.name}}',
+                phone_num: '{{asset.phone_num}}',
+                address: '{{asset.address}}',
+                sitee: '{{asset.sitee}}',
+            }
+        {% endfor %}
+        
+        $("#search").on('keyup',function(){
+            loadPage(1);
+        });
+
+        let current_page = {{current_page}};
+
+        function loadPage(page){
+            let formData = $('#filterForm').serialize() + "&page=" + page;
+            $.ajax({
+                url: "{% url 'asset_list' %}",
+                type:"GET",
+                headers:{
+                    'X-Requested-With': 'XMLHttpRequest'
+                },
+                data: formData,
+                success: function(response){
+                    updateTable(response.assets);
+                    updatePagination(response.current_page, response.total_pages);
+                    current_page = response.current_page;
+                },
+                error: function(response){
+                    alert('Error in filtering.');
+                } 
+            });
+        }
+
+        $('#filterForm').submit(function(e){
+            e.preventDefault();
+            loadPage(1);
+        })
+
+        $('#prevPage').click(function(){
+            if (current_page > 1){
+                loadPage(current_page - 1);
+            }
+        });
+        
+        $('#nextPage').click(function(){
+            loadPage(current_page + 1);
+        });
+        
+        function updatePagination(current, total){
+            $('#paginationText').text(`Page ${current} of ${total}`);
+            current_page = current;
+
+            $('#prevPage').prop('disabled', current == 1);
+            $('#nextPage').prop('disabled', current >= total);
+        }
+
+        function updateTable(assets) {
+            let tableBody = $('#assetTable tbody');
+            tableBody.empty();
+
+            assets.forEach(asset => {
+                tableBody.append(`
+                    <tr>
+                        <td>${asset.id}</td>
+                        <td>${asset.name}</td>
+                        <td>${asset.phone_num}</td>
+                        <td>${asset.address}</td>
+                        <td>${asset.sitee__name}</td>
+                        <td>${asset.sitee__customer__name}</td>
+                        <td>${asset.sitee__customer__client__name}</td>
+                    </tr>
+                `);
+            });
+        }
+
+        $('#createAssetForm').submit(function(e){
+            e.preventDefault();
+            let formData= $(this).serialize();
+            $.ajax({
+                url: '/create_asset/',
+                type:"POST",
+                data: formData,
+                success: function(response){
+                    location.reload();
+                },
+                error: function(response){
+                    alert('Error in creating asset.');
+                } 
+            });
+        });
+
+        </script>
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.min.js"></script>
+</body>
+</html>

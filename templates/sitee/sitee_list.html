@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sitee</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.11.5/css/jquery.dataTables.min.css">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+</head>
+<body>
+    <div class="container mt-5">
+        <h4 class="mb-0">Sitee List</h4>
+        <a href="{% url 'home' %}" class="btn btn-primary btn-lg">
+            <i class="fas fa-users"></i> Dashboard
+        </a>
+        <div class= "d-flex justify-content-between align-items-center my-3">
+            <button  class="btn btn-success btn-sm delete-btn" 
+            data-bs-toggle="modal"
+            data-bs-target="#createSiteeModal">
+            Add Sitee
+            </button>
+        </div>
+    </div>
+
+    <div class="modal fade" id="createSiteeModal" tabindex="-1" aria-labelledby="createSiteeModalLable" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                
+                <!-- 🔹 Modal Header -->
+                <div class="modal-header">
+                    <h5 class="modal-title" id="modalTitle">Add Sitee</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                
+                <!-- 🔹 Modal Body -->
+                <div class="modal-body">
+                    <form id = createSiteeForm method = "POST">
+                        {% csrf_token %}
+                        <input type="hidden" id="sitee_id" name="sitee_id">
+                        <div class="mb-3">
+                            <label for="sitee_name" class="form-label">Name</label>
+                            <input type="text" class="form-control" id="sitee_name" name="name">
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="sitee_phone_num" class="form-label">Phone #</label>
+                            <input type="text" class="form-control" id="sitee_phone_num" name="phone_num">
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="sitee_address" class="form-label">Address</label>
+                            <input type="text" class="form-control" id="sitee_address" name="address">
+                        </div>
+                        <select class= "for control" id="sitee_customer" name= "customer">
+                            <option value= "">Select Customer</option>
+                            {%for customer in customers %}
+                                <option value="{{ customer.id }}">{{ customer.name }}</option>
+                            {%endfor%}
+                        </select>
+                </div>
+                
+                <!-- 🔹 Modal Footer -->
+                <div class="modal-footer">
+                    <button type="submit" class="btn btn-primary">Add</button>
+                </div>
+    
+            </div>
+        </div>
+    </div>
+
+
+    <div class="container mt-4">
+        <table id="siteeTable" class="display table table-bordered table-striped">
+            <thead>
+                <tr>
+                    <th>ID#</th>
+                    <th>Name</th>
+                    <th>Phone #</th>
+                    <th>Address</th>
+                    <th>Customer</th>
+                    <th>Client</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for sitee in sitees %}
+                    <tr>
+                        <td>{{ sitee.id }}</td>
+                        <td>{{ sitee.name }}</td>
+                        <td>{{ sitee.phone_num }}</td>
+                        <td>{{ sitee.address }}</td>
+                        <td>{{ sitee.customer }}</td>
+                        <td>{{ sitee.customer.client }}</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    <script>
+        var siteesData={}
+
+        {% for sitee in sitees %}
+            siteesData['{{sites.id}}']={
+                id: "{{sitee.id}}",
+                name: "{{sitee.name}}",
+                phone_num: "{{sitee.phone_num}}",
+                address: "{{sitee.address}}",
+                customer: "{{sitee.customer}}",
+            }
+        {% endfor %}
+        console.log(siteesData)
+
+        $(document).ready(function(){
+            $("#createSiteeForm").submit(function(e){
+                e.preventDefault();
+                let formData= $(this).serialize();
+                console.log(formData)
+                $.ajax({
+                    url: "/sitee-create/",
+                    type: "POST",
+                    data : formData,
+                    success: function(response){
+                        location.reload();
+                    },
+                    error: function(response){
+                        alert("Error creating sitee.");
+                    }
+                });
+            });
+        });
+
+            
+    </script>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.min.js"></script>
+</body>
+</html>
